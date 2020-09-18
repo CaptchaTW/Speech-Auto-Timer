@@ -10,7 +10,7 @@ mic = sr.Microphone()
 text = ""
 json_file = None
 record_key = keyboard.Key.home
-typing_key = keyboard.Key.enter
+typing_key = keyboard.Key.insert 
 summoners = {"flash": 300, "cleanse": 210, "exhaust": 210, "ghost": 210, "heal": 240, "ignite": 180,
              "barrier": 180}
 keywords = ["top", "jungle", "mid", "middle", "bot", "bottom", "support", "flash", "cleanse", "exhaust", "ghost",
@@ -26,7 +26,7 @@ class Timers:
         self.start = start
         if self.game_component not in keywords:
             self.game_component = "flash"
-        self.end = summoners[game_component] + self.start
+        self.end = summoners[self.game_component] + self.start
         self.role = role
         self.status = True
         self.timer = Timer(summoners[self.game_component], self.change_status)
@@ -53,26 +53,27 @@ def on_press(key):
                 audio = r.listen(source, phrase_time_limit=4)
             try:
                 json_file = r.recognize_google(audio, language='en-CA', show_all=True)
-                most_likely = ""
-                highest_count = 0
-                for members in json_file["alternative"]:
-                    for transcript in members:
-                        current_count = 0
-                        for keys in keywords:
-                            if keys in str(members[transcript]).lower():
-                                current_count += 1
-                        if current_count > highest_count:
-                            most_likely = members[transcript]
-                            highest_count = current_count
-                text = most_likely.replace("/", "")
-                text = re.sub(r"([0-9]+)", r" \1 ", text.lower()).strip()
-                start_time = re.match('.*?([0-9]+)$', text).group(1)
-                role = re.match('^([\w]+) (\w+)', text).group(1)
-                summoner = re.match('([\w]+?) (\w+)', text).group(2)
-                timer_object = Timers(summoner, int(start_time)//100*60 + int(start_time)%100, role)
-                list_timers.append(timer_object)
-                print("Press Home to record, Enter to generate timers, escape to end program")
-                return True
+                if len(json_file)!=0:
+                    most_likely = ""
+                    highest_count = 0
+                    for members in json_file["alternative"]:
+                        for transcript in members:
+                            current_count = 0
+                            for keys in keywords:
+                                if keys in str(members[transcript]).lower():
+                                    current_count += 1
+                            if current_count > highest_count:
+                                most_likely = members[transcript]
+                                highest_count = current_count
+                    text = most_likely.replace("/", "")
+                    text = re.sub(r"([0-9]+)", r" \1 ", text.lower()).strip()
+                    start_time = re.match('.*?([0-9]+)$', text).group(1)
+                    role = re.match('^([\w]+) (\w+)', text).group(1)
+                    summoner = re.match('([\w]+?) (\w+)', text).group(2)
+                    timer_object = Timers(summoner, int(start_time)//100*60 + int(start_time)%100, role)
+                    list_timers.append(timer_object)
+                    print("Press Home to record, Insert to generate timers, escape to end program")
+                    return True
             except sr.UnknownValueError:
                 return True
         elif key == typing_key:
@@ -82,7 +83,7 @@ def on_press(key):
                     continue
                 text_holder = text_holder + " " + str(o.get_end())
             pyautogui.typewrite(text_holder)
-            print("\nPress Home to record, Enter to generate timers, escape to end program")
+            print("\nPress Home to record, Insert to generate timers, escape to end program")
             return True
     except AttributeError:
         return True
