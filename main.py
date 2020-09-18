@@ -4,6 +4,7 @@ import pyautogui
 import time
 import re
 import json
+from threading import Timer
 r = sr.Recognizer()
 mic = sr.Microphone()
 text = ""
@@ -23,9 +24,18 @@ class Timers:
         self.start = start
         self.end = summoners[game_component] + self.start
         self.role = role
+        self.status = True
+        self.timer = Timer(summoners[self.game_component], self.change_status)
+        self.timer.start()
+
+    def change_status(self):
+        self.status = False
 
     def get_end(self):
         return self.role + " " + self.game_component + " " + time.strftime("%M:%S", time.gmtime(self.end))
+
+    def get_status(self):
+        return self.status
 
 
 def on_press(key):
@@ -61,9 +71,12 @@ def on_press(key):
                 return True
         elif key == typing_key:
             for o in list_timers:
+                if not o.get_status():
+                    list_timers.remove(o)
+                    continue
                 text_holder = text_holder + " " + str(o.get_end())
             pyautogui.typewrite(text_holder)
-            return False
+            return True
     except AttributeError:
         return True
 
