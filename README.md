@@ -1,5 +1,5 @@
 # Speech-Auto-Timer
-(In progress)
+(In progress but somewhat usable)
 League of Legends Speech recognition script to keep tracks of objective timers
 
 Track summoner spells cooldowns in chat with voice.
@@ -10,6 +10,6 @@ ie:  top flash 2020 (twenty twenty, two zero two zero, 2 thousand 20)
 - Enter: Types in all current timers that are still active  (in progress)
 
 Todo: 
-- Automatically remove timers that finishes
-- Find methodology to keep track of teleport(based on timer different cooldowns)
+- <s>Automatically remove timers that finishes</s>
+- Find methodology to keep track of teleport(based on LVL, not the same system as other summonners)
 - Improve speech recognition
