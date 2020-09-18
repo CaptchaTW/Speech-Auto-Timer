@@ -17,11 +17,15 @@ keywords = ["top", "jungle", "mid", "middle", "bot", "bottom", "support", "flash
             "heal", "ignite", "barrier"]
 list_timers = []
 
+print("Press Home to record, Enter to generate timers, escape to end program")
+
 
 class Timers:
     def __init__(self, game_component, start, role):
         self.game_component = game_component
         self.start = start
+        if self.game_component not in keywords:
+            self.game_component = "flash"
         self.end = summoners[game_component] + self.start
         self.role = role
         self.status = True
@@ -43,6 +47,8 @@ def on_press(key):
     text_holder = ""
     try:
         if key == record_key:
+            print("Recording: Please say Role, Summoner Spell and Summoner spell usage time in order "
+                  "(ie: Top flash 01:00")
             with mic as source:
                 audio = r.listen(source, phrase_time_limit=4)
             try:
@@ -63,11 +69,11 @@ def on_press(key):
                 start_time = re.match('.*?([0-9]+)$', text).group(1)
                 role = re.match('^([\w]+) (\w+)', text).group(1)
                 summoner = re.match('([\w]+?) (\w+)', text).group(2)
-                print(role, summoner, start_time)
                 timer_object = Timers(summoner, int(start_time)//100*60 + int(start_time)%100, role)
                 list_timers.append(timer_object)
+                print("Press Home to record, Enter to generate timers, escape to end program")
+                return True
             except sr.UnknownValueError:
-                print(key)
                 return True
         elif key == typing_key:
             for o in list_timers:
@@ -76,6 +82,7 @@ def on_press(key):
                     continue
                 text_holder = text_holder + " " + str(o.get_end())
             pyautogui.typewrite(text_holder)
+            print("\nPress Home to record, Enter to generate timers, escape to end program")
             return True
     except AttributeError:
         return True
